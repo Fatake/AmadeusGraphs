@@ -5,7 +5,9 @@ import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-
+/**
+ * Clase principal del programa
+ */
 public class VentanaPrincipal extends JFrame {
 	//Constantes
 	private final int WINDOW_LENGTHT = 1280; //Tamaño de la Vetana (frame)
@@ -101,14 +103,14 @@ public class VentanaPrincipal extends JFrame {
 		addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){
 				if (cambios) { //Ya se realizaron cambios
-		      int jop = mostrarSeleccion("El archivo tiene cambios sin guardar, ¿Deseas guardar los cambios?");
-		      if( jop == JOptionPane.YES_OPTION) {
+					int jop = mostrarSeleccion("El archivo tiene cambios sin guardar, ¿Deseas guardar los cambios?");
+					if( jop == JOptionPane.YES_OPTION) {
 						if(ruta.equals("Sin Titulo.acm")) guardarComoArchivo();
 						else guardarArchivo();
 						salir();
 					}
 					else if (jop == JOptionPane.NO_OPTION) salir();
-		    }
+				}
 				else salir();
 			}
 		});
@@ -550,76 +552,75 @@ public class VentanaPrincipal extends JFrame {
 	}
 
 	//Guardar archivo Como
-  public void guardarComoArchivo(){
-    JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-    jfc.setDialogTitle("Guardar como: ");
-    jfc.setAcceptAllFileFilterUsed(false);
-    FileNameExtensionFilter filter = new FileNameExtensionFilter("ACM", "acm");
-    jfc.addChoosableFileFilter(filter);
+	public void guardarComoArchivo(){
+		JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		jfc.setDialogTitle("Guardar como: ");
+		jfc.setAcceptAllFileFilterUsed(false);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("ACM", "acm");
+		jfc.addChoosableFileFilter(filter);
 
-    do {
-      int returnValue = jfc.showSaveDialog(null);
-      if (returnValue == JFileChooser.APPROVE_OPTION){
-        ruta = jfc.getSelectedFile().getAbsolutePath().concat(".acm");
-        File file = new File(ruta);
+		do {
+			int returnValue = jfc.showSaveDialog(null);
+			if (returnValue == JFileChooser.APPROVE_OPTION){
+				ruta = jfc.getSelectedFile().getAbsolutePath().concat(".acm");
+				File file = new File(ruta);
 
-        if(file.exists()) { //El archivo existe?
-          int jop = this.mostrarSeleccion("Desea sobreescribir el archivo existente");
+				if(file.exists()) { //El archivo existe?
+					int jop = this.mostrarSeleccion("Desea sobreescribir el archivo existente");
 
-          //Verificar si desea sobre escribir
-          if (jop == JOptionPane.YES_OPTION) {
+					//Verificar si desea sobre escribir
+					if (jop == JOptionPane.YES_OPTION) {
 						guardarArchivo();
 						break;
 					}
-        }
-				else { //No existe el archivo se crea y se guarda
+				}else{ //No existe el archivo se crea y se guarda
 					guardarArchivo();
 					break;
 				}
-      }
+			}
 			else break;
-    } while (true);
-  }
+		} while (true);
+	}
 
 	//Guardar Archivo
 	public void guardarArchivo(){
-	  //Abrir Archivo
-	  if(Archivo.fopen(ruta, 'w')){
+		//Abrir Archivo
+		if(Archivo.fopen(ruta, 'w')){
 			ArrayList<ElementoGrafo> auxArray = new ArrayList<>();
 
 			auxArray.addAll(workPanel.getVertices());
 			auxArray.addAll(workPanel.getAristas());
 
-	    //Escribir Archivo
-	    if(!Archivo.fwrite((Object) auxArray))
-	      mostrarAdvertencia("ERROR: No se puedo guardar el archivo");
+			//Escribir Archivo
+			if(!Archivo.fwrite((Object) auxArray))
+				mostrarAdvertencia("ERROR: No se puedo guardar el archivo");
 
-	    //Cerrar Archivo
-	    Archivo.fclose('w');
+			//Cerrar Archivo
+			Archivo.fclose('w');
 
 			cambios(false);
-	  }
-	  else mostrarAdvertencia("ERROR: No se puedo salvar el archivo ");
+		}else
+			mostrarAdvertencia("ERROR: No se puedo salvar el archivo ");
 	}
 
 	//Abrir Archivo
 	public void abrirArchivo(){
-	  JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-	  jfc.setDialogTitle("Seleecione un archivo .acm");
-	  jfc.setAcceptAllFileFilterUsed(false);
-	  FileNameExtensionFilter filter = new FileNameExtensionFilter("ACM", "acm");
-	  jfc.addChoosableFileFilter(filter);
+		JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		jfc.setDialogTitle("Seleecione un archivo .acm");
+		jfc.setAcceptAllFileFilterUsed(false);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("ACM", "acm");
+		jfc.addChoosableFileFilter(filter);
 
-	  int returnValue = jfc.showOpenDialog(null);
-	  if (returnValue == JFileChooser.APPROVE_OPTION) {
-	    reiniciarFrame(); //Reiniciar componentes
-	    ruta = jfc.getSelectedFile().getPath();
+		int returnValue = jfc.showOpenDialog(null);
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			reiniciarFrame(); //Reiniciar componentes
+			ruta = jfc.getSelectedFile().getPath();
 
-	    //Abrir Archivo
-	    if(Archivo.fopen(ruta, 'r')){
+			//Abrir Archivo
+			if(Archivo.fopen(ruta, 'r')){
 				//ArrayList's Auxiliares
-	      ArrayList<Arista> auxAristas = new ArrayList<>();
-	      ArrayList<Vertice> auxVertices = new ArrayList<>();;
+				ArrayList<Arista> auxAristas = new ArrayList<>();
+				ArrayList<Vertice> auxVertices = new ArrayList<>();;
 
 				ArrayList<Object> auxArray = (ArrayList<Object>) Archivo.fread();
 
@@ -630,51 +631,55 @@ public class VentanaPrincipal extends JFrame {
 						auxAristas.add((Arista) elemento);
 				}
 
-				if (auxVertices == null) System.out.println("Vertices");
-				if (auxAristas == null) System.out.println("Aristas");
+				if (auxVertices == null)
+					System.out.println("Vertices");
+				if (auxAristas == null)
+					System.out.println("Aristas");
 
-        workPanel.setVertices(auxVertices);
-        workPanel.setAristas(auxAristas);
+				workPanel.setVertices(auxVertices);
+				workPanel.setAristas(auxAristas);
 
-        //Cerrar archivo
-        Archivo.fclose('r');
+				//Cerrar archivo
+				Archivo.fclose('r');
 
-        //Inicializar Vertices y Aristas
-        for(Vertice vertice : workPanel.getVertices()){
-          PanelDetalles nuevoPanelDetalle = new PanelDetalles(vertice);
-          detallesVertices.add(nuevoPanelDetalle);
+				//Inicializar Vertices y Aristas
+				for(Vertice vertice : workPanel.getVertices()){
+					PanelDetalles nuevoPanelDetalle = new PanelDetalles(vertice);
+					detallesVertices.add(nuevoPanelDetalle);
 
-          //Implementacion del boton eliminar
-          nuevoPanelDetalle.getBotonEliminar().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-              botonEliminarMouseClicked(evt, nuevoPanelDetalle);
-            }
-          });
-        }
+					//Implementacion del boton eliminar
+					nuevoPanelDetalle.getBotonEliminar().addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent evt) {
+							botonEliminarMouseClicked(evt, nuevoPanelDetalle);
+						}
+					});
+				}
 
-        for(Arista arista : workPanel.getAristas()){
-          PanelDetalles nuevoPanelDetalle = new PanelDetalles(arista);
-          detallesAristas.add(nuevoPanelDetalle);
+				for(Arista arista : workPanel.getAristas()){
+					PanelDetalles nuevoPanelDetalle = new PanelDetalles(arista);
+					detallesAristas.add(nuevoPanelDetalle);
 
-          //Implementacion del boton eliminar
-          nuevoPanelDetalle.getBotonEliminar().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-              botonEliminarMouseClicked(evt, nuevoPanelDetalle);
-            }
-          });
-        }
-        actualizarInfoEditorGrafo();
-        seleccionarElemento(null);
+					//Implementacion del boton eliminar
+					nuevoPanelDetalle.getBotonEliminar().addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent evt) {
+							botonEliminarMouseClicked(evt, nuevoPanelDetalle);
+						}
+					});
+				}
+				actualizarInfoEditorGrafo();
+				seleccionarElemento(null);
 
-        if (auxAristas.size() != 0) Arista.setContID(workPanel.getAristas().get(workPanel.getAristas().size()-1).getID()); //ID SE INICIALIZA EN LA ULTIMA ARISTA
-        if (auxVertices.size() != 0) Vertice.setContID(workPanel.getVertices().get(workPanel.getVertices().size()-1).getID()); //ID SE INICIALIZA EN EL ULTIMO VERTICE
+				if (auxAristas.size() != 0)
+					Arista.setContID(workPanel.getAristas().get(workPanel.getAristas().size()-1).getID()); //ID SE INICIALIZA EN LA ULTIMA ARISTA
+				if (auxVertices.size() != 0)
+					Vertice.setContID(workPanel.getVertices().get(workPanel.getVertices().size()-1).getID()); //ID SE INICIALIZA EN EL ULTIMO VERTICE
 
 				cambios(false);
-	    }
-	  }
-	}
+			}
+		}
+		}
 
 	//Abrir Archivo nuevo
 	public void reiniciarFrame() {
@@ -860,34 +865,38 @@ public class VentanaPrincipal extends JFrame {
 
 	//Procesamiento en modo Propiedades
 	public void procesamientoPropiedades(MouseEvent evt) {
-
+		/*
+		 * Futuras Actualizaciones
+		 */
 	}
 
 	//Atencion sobre el panel del elemento seleccionado
 	private void seleccionarElemento(ElementoGrafo elemento) {
 		workPanel.seleccionarElemento(elemento);
 
-		if (modoEditor) {
+		if (modoEditor){
 			//Se actualizan los paneles de detalles
-			for (PanelDetalles detalle : detallesAristas) {
-				if (detalle.esPanelDe(elemento)) detalle.panelSeleccionado(true);
-				else detalle.panelSeleccionado(false);
-			}
-			for (PanelDetalles detalle : detallesVertices) {
-				if (detalle.esPanelDe(elemento)) detalle.panelSeleccionado(true);
-				else detalle.panelSeleccionado(false);
-			}
+			for (PanelDetalles detalle : detallesAristas)
+				if (detalle.esPanelDe(elemento))
+					detalle.panelSeleccionado(true);
+				else
+					detalle.panelSeleccionado(false);
+
+			for (PanelDetalles detalle : detallesVertices)
+				if (detalle.esPanelDe(elemento))
+					detalle.panelSeleccionado(true);
+				else
+					detalle.panelSeleccionado(false);
+
 
 			actualizarInfoEditorGrafo();
-		}
-		else {
+		}else{
 			//Se muestra el panel de detalles del elemento seleccionado
 			panelPropiedadesGrafo.removeAll();
 
-			if (elemento == null) {
+			if (elemento == null)
 				panelPropiedadesGrafo.add(new JLabel("Propiedades"));
-			}
-			else {
+			else{
 				for (PanelDetalles detalle : detallesAristas)
 					if (detalle.esPanelDe(elemento)) {
 						detalle.panelSeleccionado(true);
@@ -912,38 +921,40 @@ public class VentanaPrincipal extends JFrame {
 	public void menuArchivoNuevoMouseClicked(ActionEvent evt) {
 		if (cambios) {
 			int jop = mostrarSeleccion("El archivo tiene cambios sin guardar, ¿Deseas guardar los cambios?");
-      if (jop == JOptionPane.YES_OPTION) {
+			if (jop == JOptionPane.YES_OPTION) {
 				guardarArchivo();
 				reiniciarFrame();
-			}
-			else if (jop == JOptionPane.NO_OPTION) reiniciarFrame();
-		}
-		else reiniciarFrame();
+			}else if 
+				(jop == JOptionPane.NO_OPTION) reiniciarFrame();
+		}else
+			reiniciarFrame();
 	}
 
 	//Click sobre menuArchivoAbrir
 	public void menuArchivoAbrirMouseClicked(ActionEvent evt){
-    if (cambios) { //Ya se realizaron cambios
-      int jop = mostrarSeleccion("El archivo tiene cambios sin guardar, ¿Deseas guardar los cambios?");
-      if( jop == JOptionPane.YES_OPTION) {
+		if (cambios) { //Ya se realizaron cambios
+			int jop = mostrarSeleccion("El archivo tiene cambios sin guardar, ¿Deseas guardar los cambios?");
+			if( jop == JOptionPane.YES_OPTION) {
 				guardarArchivo();
 				abrirArchivo();
 			}
 			else if (jop == JOptionPane.NO_OPTION) abrirArchivo();
-    }
-		else abrirArchivo();
+		}else
+			abrirArchivo();
 	}
 
 	//Click sobre menuArchivoGuardar
 	public void menuArchivoGuardarMouseClicked(ActionEvent evt){
-    if (ruta.equals("Sin Titulo.acm")) guardarComoArchivo();
-    else guardarArchivo();
+		if
+			(ruta.equals("Sin Titulo.acm")) guardarComoArchivo();
+		else
+			guardarArchivo();
 	}
 
 	//Click sobre menuArchivoGuardarComo
 	public void menuArchivoGuardarComoMouseClicked(ActionEvent evt){
-    guardarComoArchivo();
-  }
+		guardarComoArchivo();
+	}
 
 	//Click sobre menuGrafoBorrar
 	public void menuGrafoBorrarMouseClicked(ActionEvent evt) {
@@ -1063,7 +1074,7 @@ public class VentanaPrincipal extends JFrame {
 		if (grafo.tieneRecorridoEuler())
 			JOptionPane.showMessageDialog(this, "El grafo tiene al menos un Recorrido Euleriano", "Recorrido Euleriano", JOptionPane.INFORMATION_MESSAGE);
 		else
-				JOptionPane.showMessageDialog(this, "El grafo no tiene ningun Recorrido Euleriano", "Recorrido Euleriano", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, "El grafo no tiene ningun Recorrido Euleriano", "Recorrido Euleriano", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	//Eventos de botonCircuitoEuler
